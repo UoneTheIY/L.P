@@ -3,146 +3,147 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>L.P Chatbot</title>
+<title>L.P AI</title>
 
 <style>
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #0f172a;
+    font-family: system-ui;
+    background: #343541;
     color: white;
     display: flex;
     flex-direction: column;
     height: 100vh;
 }
 
-header {
-    background: #1e293b;
-    padding: 15px;
-    text-align: center;
-    font-weight: bold;
-}
-
 #chat {
     flex: 1;
-    padding: 10px;
     overflow-y: auto;
+    padding: 20px;
 }
 
-.message {
-    margin: 10px 0;
-    padding: 10px;
+.msg {
+    max-width: 800px;
+    margin: 10px auto;
+    padding: 15px;
     border-radius: 10px;
-    max-width: 80%;
 }
 
-.user {
-    background: #2563eb;
-    margin-left: auto;
-}
-
-.bot {
-    background: #334155;
-    margin-right: auto;
-}
+.user { background: #444654; }
+.bot { background: #3e3f4b; }
 
 #inputArea {
     display: flex;
     padding: 10px;
-    background: #1e293b;
+    background: #40414f;
 }
 
 input {
     flex: 1;
-    padding: 10px;
-    border-radius: 8px;
+    padding: 12px;
+    border-radius: 6px;
     border: none;
-    outline: none;
 }
 
 button {
     margin-left: 10px;
-    padding: 10px;
+    padding: 12px;
+    background: #19c37d;
     border: none;
-    border-radius: 8px;
-    background: #22c55e;
+    border-radius: 6px;
     color: white;
-    cursor: pointer;
 }
 </style>
 </head>
 
 <body>
 
-<header>L.P Chatbot</header>
-
 <div id="chat"></div>
 
 <div id="inputArea">
-    <input id="input" placeholder="Digite sua mensagem...">
-    <button onclick="sendMessage()">Enviar</button>
+    <input id="input" placeholder="Pergunte algo...">
+    <button onclick="send()">Enviar</button>
 </div>
 
 <script>
+const API_KEY = "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"; // ⚠️ NÃO SEGURO
+
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 
-// ⚠️ COLOQUE SUA API KEY AQUI (somente para testes locais)
-const API_KEY = "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";
+// 🧠 memória
+let messages = [
+    { role: "system", content: "Você é L.P, um assistente inteligente e amigável." }
+];
 
 function addMessage(text, sender) {
     const div = document.createElement("div");
-    div.className = "message " + sender;
+    div.className = "msg " + sender;
     div.innerText = text;
     chat.appendChild(div);
     chat.scrollTop = chat.scrollHeight;
+    return div;
 }
 
-async function sendMessage() {
-    const userText = input.value;
-    if (!userText) return;
+async function send() {
+    const text = input.value;
+    if (!text) return;
 
-    addMessage(userText, "user");
     input.value = "";
 
-    addMessage("Pensando...", "bot");
+    messages.push({ role: "user", content: text });
+    addMessage(text, "user");
 
-    try {
-        const response = await fetch("http://192.168.1.15:3000/chat")", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + API_KEY
-            },
-            body: JSON.stringify({
-                model: "llama-3.1-8b-instant",
-                messages: [
-                    { role: "system", content: "Você é um assistente útil chamado L.P." },
-                    { role: "user", content: userText }
-                ]
-            })
-        });
+    const botDiv = addMessage("", "bot");
 
-        const data = await response.json();
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + API_KEY
+        },
+        body: JSON.stringify({
+            model: "llama3-70b-8192",
+            messages,
+            stream: true
+        })
+    });
 
-        // remove "Pensando..."
-        chat.removeChild(chat.lastChild);
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
 
-        const reply = data.choices[0].message.content;
-        addMessage(reply, "bot");
+    let fullText = "";
 
-    } catch (error) {
-        chat.removeChild(chat.lastChild);
-        addMessage("Erro ao conectar com a API.", "bot");
-        console.error(error);
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split("\n");
+
+        for (let line of lines) {
+            if (line.includes("data:")) {
+                const json = line.replace("data: ", "").trim();
+
+                if (json === "[DONE]") break;
+
+                try {
+                    const parsed = JSON.parse(json);
+                    const token = parsed.choices[0].delta?.content || "";
+
+                    fullText += token;
+                    botDiv.innerText = fullText;
+                } catch {}
+            }
+        }
     }
+
+    messages.push({ role: "assistant", content: fullText });
 }
 
-// Enter envia mensagem
-input.addEventListener("keypress", function(e) {
-    if (e.key === "Enter") {
-        sendMessage();
-    }
+// Enter envia
+input.addEventListener("keypress", e => {
+    if (e.key === "Enter") send();
 });
 </script>
 
