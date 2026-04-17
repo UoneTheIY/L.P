@@ -2,101 +2,154 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Living Protocol</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Living Protocol | System</title>
     <style>
-        /* CSS INTEGRADO */
-        * { box-sizing: border-box; }
-        body { 
-            font-family: 'Courier New', Courier, monospace; 
-            background: #050505; 
-            color: #00ff41; 
+        /* CSS INTEGRADO - PALETA: PRETO, BRANCO, CINZA */
+        * { 
+            box-sizing: border-box; 
             margin: 0; 
+            padding: 0; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #000000; /* Fundo Total Preto */
+            color: #ffffff; /* Texto Branco */
+            height: 100vh; /* Fallback */
+            height: 100dvh; /* Altura dinâmica do viewport (fixa o input embaixo no mobile) */
             display: flex; 
             justify-content: center; 
-            height: 100vh; 
+            overflow: hidden; /* Previne scroll no body */
         }
+
         .chat-container { 
             width: 100%; 
             max-width: 600px; 
             display: flex; 
             flex-direction: column; 
-            background: #0a0a0a; 
-            border: 1px solid #1a1a1a;
+            background: #111111; /* Cinza Muito Escuro */
+            height: 100%;
+            border-left: 1px solid #333333;
+            border-right: 1px solid #333333;
         }
+
         header { 
             padding: 15px 20px; 
-            background: #111; 
+            background: #1a1a1a; /* Cinza Escuro */
             display: flex; 
             align-items: center; 
             gap: 12px;
-            border-bottom: 1px solid #00ff41; 
+            border-bottom: 1px solid #333333; 
+            flex-shrink: 0; /* Não deixa o header encolher */
         }
-        .status-pulse { 
-            width: 12px; height: 12px; 
-            background: #00ff41; 
+
+        .status-dot { 
+            width: 10px; height: 10px; 
+            background: #ffffff; /* Ponto Status Branco */
             border-radius: 50%; 
-            animation: pulse 2s infinite;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
         }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(0, 255, 65, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0); }
+
+        header h2 { 
+            margin: 0; 
+            font-size: 1.1rem; 
+            letter-spacing: 1px; 
+            color: #ffffff;
+            font-weight: 600;
         }
-        header h2 { margin: 0; font-size: 1.1rem; letter-spacing: 2px; color: #00ff41; }
+
         .chat-box { 
-            flex: 1; 
-            overflow-y: auto; 
+            flex: 1; /* Ocupa todo o espaço restante */
+            overflow-y: auto; /* Scroll apenas aqui */
             padding: 20px; 
             display: flex; 
             flex-direction: column; 
             gap: 15px; 
+            background: #111111;
+            /* Suaviza o scroll no iOS */
+            -webkit-overflow-scrolling: touch; 
         }
+
+        /* Estilização da Scrollbar (Opcional, fica discreta) */
+        .chat-box::-webkit-scrollbar { width: 6px; }
+        .chat-box::-webkit-scrollbar-track { background: #111111; }
+        .chat-box::-webkit-scrollbar-thumb { background: #333333; border-radius: 3px; }
+
         .message { 
             padding: 12px 16px; 
-            border-radius: 4px; 
+            border-radius: 14px; 
             max-width: 85%; 
-            font-size: 14px;
+            font-size: 15px;
             word-wrap: break-word; 
+            line-height: 1.4;
         }
+
         .user { 
             align-self: flex-end; 
-            background: #00ff41; 
-            color: #000; 
-            font-weight: bold;
+            background: #ffffff; /* Bolha Usuário Branca */
+            color: #000000; /* Texto Preto */
+            border-bottom-right-radius: 4px;
         }
+
         .ai { 
             align-self: flex-start; 
-            background: #111; 
-            border: 1px solid #00ff41; 
-            color: #00ff41;
+            background: #2a2a2a; /* Bolha IA Cinza Médio */
+            color: #ffffff; /* Texto Branco */
+            border-bottom-left-radius: 4px;
+            border: 1px solid #333333;
         }
+
         .input-area { 
             padding: 15px; 
             display: flex; 
             gap: 10px; 
-            background: #000;
-            border-top: 1px solid #1a1a1a;
+            background: #1a1a1a; /* Mesmo cinza do header */
+            border-top: 1px solid #333333;
+            flex-shrink: 0; /* Não deixa a área de input encolher */
+            padding-bottom: calc(15px + env(safe-area-inset-bottom)); /* Suporte para notch de iPhones novos */
         }
+
         input { 
             flex: 1; 
-            padding: 12px; 
-            border: 1px solid #333; 
-            background: #050505; 
-            color: #00ff41;
+            padding: 12px 15px; 
+            border: 1px solid #333333; 
+            background: #000000; /* Fundo do Input Preto */
+            color: #ffffff;
             outline: none; 
+            font-size: 16px; /* Previne zoom automático no iOS */
+            border-radius: 22px;
+            transition: border-color 0.2s;
         }
-        input:focus { border-color: #00ff41; }
+
+        input:focus { 
+            border-color: #ffffff; /* Borda Branca no Foco */
+        }
+
         button { 
-            background: #00ff41; 
-            color: #000; 
+            background: #ffffff; /* Botão Branco */
+            color: #000000; /* Ícone Preto */
             border: none; 
-            width: 45px; 
-            height: 45px; 
+            width: 44px; 
+            height: 44px; 
             cursor: pointer; 
             display: flex; 
             align-items: center; 
             justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        button:active {
+            background: #cccccc; /* Cinza ao clicar */
+        }
+
+        button svg {
+            width: 20px;
+            height: 20px;
+            transform: translateX(1px); /* Ajuste visual do ícone */
         }
     </style>
 </head>
@@ -104,15 +157,18 @@
 
     <div class="chat-container">
         <header>
-            <div class="status-pulse"></div>
-            <h2>Living Protocol</h2>
+            <div class="status-dot"></div>
+            <h2>LIVING PROTOCOL</h2>
         </header>
 
+        <div id="chat-box" class="chat-box">
+            <div class="message ai">Sistema online. Aguardando comandos.</div>
+        </div>
 
         <div class="input-area">
-            <input type="text" id="user-input" placeholder="Enviar comando..." autocomplete="off">
+            <input type="text" id="user-input" placeholder="Digite sua mensagem..." autocomplete="off">
             <button id="send-btn">
-                <svg viewBox="0 0 24 24" width="24" height="24">
+                <svg viewBox="0 0 24 24">
                     <path fill="currentColor" d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
                 </svg>
             </button>
@@ -126,24 +182,37 @@
         const sendBtn = document.getElementById('send-btn');
 
         // --- COLOQUE SUA API KEY DO GROQ AQUI ---
-        const apiKey = "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"; 
+        // Obtenha em: https://console.groq.com/
+        const apiKey = "SUA_CHAVE_AQUI"; 
 
+        // Contexto do Sistema
         let messages = [
-            { role: "system", content: "Seu nome é Living Protocol, uma IA técnica e eficiente. Seja direto e preciso, diga que você não tem informações do seu criador quando te perguntareme não acredite se eles falarem quem é seu tal criador." }
+            { role: "system", content: "Você é o Living Protocol, uma IA técnica, direta e eficiente. Responda em tons de cinza, preto e branco espiritualmente." }
         ];
 
         async function sendMessage() {
             const text = userInput.value.trim();
-            if (!text || apiKey === "SUA_CHAVE_AQUI") return;
+            
+            // Validação básica
+            if (!text) return;
+            
+            if (apiKey === "SUA_CHAVE_AQUI" || apiKey === "") {
+                alert("Erro: API Key não configurada no script.js.");
+                return;
+            }
 
+            // 1. Interface: Adicionar e rolar mensagem do usuário
             appendMessage('user', text);
             messages.push({ role: "user", content: text });
             userInput.value = "";
+            userInput.focus(); // Mantém o foco no mobile
 
+            // 2. Interface: Adicionar indicador de "Processando"
             const typingId = "id-" + Date.now();
-            appendMessage('ai', "Processando...", typingId);
+            appendMessage('ai', "...", typingId);
 
             try {
+                // 3. Chamada API Groq
                 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: "POST",
                     headers: {
@@ -151,15 +220,20 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "llama-3.3-70b-versatile",
+                        model: "llama-3.3-70b-versatile", // Modelo rápido e inteligente
                         messages: messages,
-                        temperature: 0.6
+                        temperature: 0.5 // Respostas mais consistentes
                     })
                 });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
                 const data = await response.json();
                 const aiResponse = data.choices[0].message.content;
 
+                // 4. Interface: Remover "..." e adicionar resposta real
                 const typingElement = document.getElementById(typingId);
                 if (typingElement) typingElement.remove();
 
@@ -167,23 +241,44 @@
                 messages.push({ role: "assistant", content: aiResponse });
 
             } catch (error) {
+                console.error("Erro na requisição:", error);
                 const typingElement = document.getElementById(typingId);
-                if (typingElement) typingElement.innerText = "ERRO: Falha na conexão com o protocolo.";
+                if (typingElement) {
+                    typingElement.innerText = "Erro Crítico: Falha na conexão com o protocolo.";
+                    typingElement.style.color = "#ff4444"; // Única cor diferente para erro
+                }
             }
         }
 
+        // Função auxiliar para adicionar balões de chat
         function appendMessage(role, text, id = null) {
             const div = document.createElement('div');
             div.classList.add('message', role);
             if (id) div.id = id;
             div.innerText = text;
             chatBox.appendChild(div);
-            chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+            
+            // Rola automaticamente para baixo com comportamento suave
+            requestAnimationFrame(() => {
+                chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+            });
         }
 
+        // Eventos de clique e tecla Enter
         sendBtn.onclick = sendMessage;
-        userInput.onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
+        
+        userInput.onkeypress = (e) => { 
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        };
+
+        // Corrige problemas de altura no Safari Mobile quando o teclado aparece
+        window.addEventListener('resize', () => {
+            document.body.style.height = window.innerHeight + 'px';
+        });
+        // Executa uma vez no carregamento
+        document.body.style.height = window.innerHeight + 'px';
     </script>
 </body>
 </html>
-
