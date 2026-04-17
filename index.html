@@ -183,7 +183,7 @@
 
         // --- COLOQUE SUA API KEY DO GROQ AQUI ---
         // Obtenha em: https://console.groq.com/
-        const apiKey = "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"; 
+        const apiKey = "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"; 
 
         // Contexto do Sistema
         let messages = [
@@ -220,7 +220,7 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "llama-3.3-70b-versatile", // Modelo rápido e inteligente
+                        model: "llama-3.1-8b-instant", // Modelo rápido e inteligente
                         messages: messages,
                         temperature: 0.5 // Respostas mais consistentes
                     })
